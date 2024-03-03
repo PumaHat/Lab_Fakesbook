@@ -14,15 +14,21 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os, sys
 
+load_dotenv()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # Servicio
-SECRET_KEY = os.environ['LUA_SECRET_KEY']
-DEBUG = bool(os.environ.get('LUA_DEBUG'))
-ALLOWED_HOSTS = os.environ['LUA_ALLOWED_HOSTS'].split(',')
+SECRET_KEY = os.environ['PHCT_SECRET_KEY']
+DEBUG = bool(os.environ.get('PHCT_DEBUG'))
+ALLOWED_HOSTS = os.environ['PHCT_ALLOWED_HOSTS'].split(',')
 APPEND_SLASH = False
 
 # Application definition
 
 INSTALLED_APPS = [
+    'publicaciones',
+    'usuarios',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -33,8 +39,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'phct.middleware.CorsMiddleware'
 ]
-ROOT_URLCONF = 'tendedero.urls'
+ROOT_URLCONF = 'phct.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -50,7 +57,7 @@ TEMPLATES = [
         },
     },
 ]
-WSGI_APPLICATION = 'tendedero.wsgi.application'
+WSGI_APPLICATION = 'phct.wsgi.application'
 
 
 # Database
@@ -85,3 +92,10 @@ USE_I18N = True
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_POSTS_ROOT = os.path.join(MEDIA_ROOT, 'posts')
+MEDIA_PROFILE_ROOT = os.path.join(MEDIA_ROOT, 'profile')
+for d in (MEDIA_ROOT, MEDIA_POSTS_ROOT, MEDIA_PROFILE_ROOT):
+    if not os.path.exists(d):
+        os.mkdir(d)
