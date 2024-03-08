@@ -1,0 +1,215 @@
+html {
+    width: 100vw;
+    height: 100vh;
+    background-image: url("estesi.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+} 
+
+body {
+    font-family: "PT Sans Narrow", serif;
+} 
+
+body>header{
+    /*border: lightskyblue 2px solid;*/
+    background-color: #e6e6fe8f;
+    display: block;
+    margin-inline: auto;
+    width: fit-content;
+    padding: 1px 20px;
+    border-radius: 15px;
+    margin-bottom: 60px;
+}
+
+h1, h2 {
+    font-family: "Marhey", sans-serif;
+    text-align: center;
+    text-shadow: 1px 3px black;
+    color: plum;
+}
+
+button {
+    border: none;
+    background-color: #12339b;
+    padding: .5rem;
+    border-radius: 4px;
+    color: white;
+    margin-inline: 10px;
+}
+
+button:hover {
+    background-color: lightskyblue;
+}
+
+button:active {
+    border: black 2px solid;
+    background-color: lightskyblue;
+}
+
+.cajita>div {
+    margin: 1rem;
+    text-align: center;
+}
+
+input[type=text], input[type=password], input[type=search], textarea {
+    padding: .5rem;
+    border-radius: 4px;
+    margin-right: 2px;
+}
+.cajita{
+    background-color: #e6e6fe8f;
+    padding: 10px;
+    margin-inline: 5%;
+    width: fit-content;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+#p_sesion{
+    display: grid;
+    grid-template-columns: 50% 50%;
+    justify-items: center;
+}
+
+#p_sesion p{
+    font-size: x-large;
+    text-align: justify;
+}
+
+article[hidden]{
+    display: none !important;
+}
+
+.cajitacomentarios>div {
+    margin: 1rem;
+    text-align: center;
+}
+
+.cajitacomentarios>input{
+    margin-bottom: 1rem;
+}
+.cajitacomentarios{
+    width: fit-content;
+    padding: 2rem;
+    background: #e6e6fe8f;
+    border-radius: 10px;
+    margin-inline: auto;
+}
+
+#foto_p{
+    border-radius: 50%;
+    width: 6rem;  
+    height: 100%;  
+    float: left;
+    padding-left: 5px;
+}
+
+#p_principal{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: start;
+    position: relative;
+}
+
+#p_principal #genero, h3{
+    padding-left: 7rem;
+}
+
+#p_principal h4{
+    margin-left: 60px;
+}
+
+#foto_pub{
+    border-radius: 50%;
+    width: 3rem;    
+    float: left;
+}
+
+.pub_contenido{
+    padding-left: 3rem;
+}
+
+#nueva_pub{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.publicacion{
+    padding: 15px;
+    border-radius: 14px;
+    background: #e6e6fedf;
+    /*background: #000000df;*/
+    /*border-bottom: 2px #12339b solid;*/
+    margin-bottom: 20px;
+}
+
+#comentarios{
+    display: flex;
+    align-items: center;
+}
+
+#b_herramientas{
+    margin-left: 0;
+    position: fixed;
+    text-align: center;
+    padding: 8px;
+    background: #e6e6fe8f;
+    border-radius: 5px;
+    height: fit-content;
+    width: min-content;
+    left: 0;
+}
+
+textarea{
+    width: 20rem;
+    height: 1rem;
+    border-radius: 20px;
+    resize: none;
+}
+
+#b_herramientas>span{
+    font-size: x-large;
+    transition: 0.5s linear;
+}
+
+#b_herramientas>span:hover{
+    font-size: xx-large;
+    color: blueviolet;
+    transition: 0.5s linear;
+}
+
+#perfil{
+    display: grid;
+    grid-template-areas: "foto nombre"
+                        "biografía biografía"
+                        "estado estado";
+    border-top: 25px solid #dda0dd8f;
+    padding-top: 10px;
+    position: fixed;
+    right: 30px;
+    background: #e6e6fe8f;
+    border-radius: 10px;
+}
+#pub{
+    padding-right: 350px;
+}
+
+#foto_p{ 
+    grid-area: foto;
+}
+#info{grid-area: foto;}
+.bio{
+    grid-area: biografía;
+    padding: 5px;
+}
+.est{
+    grid-area: estado;
+    padding: 5px;
+    margin: 0;
+    background-color: #dda0dd8f;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
