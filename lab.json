@@ -1,0 +1,8 @@
+{
+  "nombre": "Fakesbook",
+  "descripcion": "Ayuda a Sam, Alex y Clover a borrar un secreto vergonzoso que se publicó en la red social de su preparatoria",
+  "temas": [
+    "lfi",
+    "rce"
+  ]
+}
