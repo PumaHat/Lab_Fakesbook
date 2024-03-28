@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fakesbook</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marhey:wght@300..700&family=PT+Sans+Narrow:wght@400;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <script src="script.js"></script>
@@ -106,7 +104,6 @@
 
         <section id="perfil">
             <img id="foto_p">
-            <input type="file" hidden>
             
             <div id="info">
                 <h3></h3>
@@ -115,14 +112,15 @@
             
             <p id="bio">Biografía: <span></span></p>
             <p id="est">Estado: <span></span></p>
-            <div><button id="btn_editar_perfil">Editar</button></div>
+            <div id="env_btn_editar_perfil"><button id="btn_editar_perfil">Editar</button></div>
         </section>
     </article>
 
     <article id="p_editarperfil" hidden>
         <div class="cajitacomentarios">
             <h2>Editar perfil</h2>
-            <div><img id="edit_foto_p"></div>
+            <div><label for="nuevo_foto_p"><img id="edit_foto_p"></label></div>
+            <input type="file" id="nuevo_foto_p" hidden>
             <div>
                 <label for="editnomusu">Nombre de usuario: </label>
                 <input type="text" name="usuario" id="editnomusu" placeholder="gatitolector23">

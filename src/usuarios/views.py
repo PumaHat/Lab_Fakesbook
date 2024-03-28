@@ -63,8 +63,7 @@ def usuario_crear(request):
         nuevo_p.full_clean()
         nuevo_p.save()
         return HttpResponse(status=201)
-    except Exception as e:
-        print(e.error_dict)
+    except:
         return HttpResponse(status=400)
 
 def usuario_ver(request, **kwargs):
@@ -87,7 +86,7 @@ def usuario_descargar(request, **kwargs):
     try:
         arch = open(os.path.join(settings.MEDIA_PROFILE_ROOT, str(kwargs['int'])), "rb")
         return HttpResponse(arch.read(), status=200, content_type='application/octet-stream')
-    except Exception as e:
+    except:
         arch = StringIO('<?xml version="1.0"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="340" height="340">\n<path fill="#fff" d="m169,.5a169,169 0 1,0 2,0zm0,86a76,76 0 1\n1-2,0zM57,287q27-35 67-35h92q40,0 67,35a164,164 0 0,1-226,0"/>\n</svg>')
         return HttpResponse(arch.read(), status=200, content_type='image/svg+xml')
 
@@ -100,7 +99,7 @@ def usuario_subir(request, **kwargs):
         usuario = Perfil.objects.get(pk=kwargs['int'])
     except:
         return HttpResponse(status=400)
-    if not request.user.pk == perfil.pk:
+    if not request.user.pk == usuario.pk:
         return HttpResponse(status=403)
     try:
         usuario.fotografia = True
@@ -109,7 +108,7 @@ def usuario_subir(request, **kwargs):
         with open(os.path.join(settings.MEDIA_PROFILE_ROOT, str(usuario.pk)), "wb") as f:
             for chunk in data.chunks():
                 f.write(chunk)
-        return HttpResponse(status=200)
+        return HttpResponse(status=204)
     except:
         return HttpResponse(status=500)
 

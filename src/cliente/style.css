@@ -113,9 +113,9 @@ article[hidden]{
     position: relative;
 }
 
-#p_principal #genero, h3{
+/*#p_principal #genero, h3{
     padding-left: 7rem;
-}
+}*/
 
 #p_principal h4{
     margin: 0;
@@ -206,15 +206,17 @@ textarea{
 
 #perfil{
     display: grid;
-    grid-template-areas: "foto nombre"
-                         "biografía biografía"
-                         "estado estado";
+    grid-template-areas: "foto nombre btn"
+                         "biografía biografía biografía"
+                         "estado estado estado";
     border-top: 25px solid #dda0dd8f;
     padding-top: 10px;
     position: fixed;
     right: 30px;
     background: #e6e6fe8f;
     border-radius: 10px;
+    grid-template-columns: auto 1fr auto;
+    gap: 0 1rem;
 }
 
 #genero, #bio, #est {
@@ -229,11 +231,11 @@ textarea{
     padding-right: 350px;
 }
 
-#foto_p{ 
+#foto_p{
     grid-area: foto;
 }
 #edit_foto_p{max-width: 10rem;}
-#info{grid-area: foto;}
+#info{grid-area: nombre;}
 #bio{
     grid-area: biografía;
     padding: 5px;
@@ -246,6 +248,8 @@ textarea{
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
+
+#env_btn_editar_perfil {grid-area: btn;}
 
 #editgenero:has(option[value=otro]:not(:checked)) + #editgenerootro{
   display: none;

@@ -60,8 +60,10 @@ function dibujarPublicacion(obj){
 function rellenarTarjeta(){
     let idu = localStorage.getItem('usuario');
     let tarjeta = document.getElementById("perfil");
-    document.getElementById("foto_p").src = window.dominio + "/usuario_descargar/" + idu;
-    document.getElementById("edit_foto_p").src = window.dominio + "/usuario_descargar/" + idu;
+    let srcimg = window.dominio + "/usuario_descargar/" + idu + "?" + (new Date()).toISOString();
+    document.getElementById("foto_p").src = srcimg;
+    document.getElementById("edit_foto_p").src = srcimg;
+    document.querySelector("#nueva_pub .foto_pub").src = srcimg;
     xhrobj = new XMLHttpRequest();
     xhrobj.open("GET", window.dominio+"/usuario_ver/"+idu);
     xhrobj.addEventListener("readystatechange", () => {
@@ -126,9 +128,6 @@ document.addEventListener("DOMContentLoaded", _ => {
     } else history.pushState(null, null, "#sesion");
     cambiarPagina();
 
-    document.getElementById("inicio").addEventListener("click", _ => {
-    });
-
     /* Eventos de botones */
     document.getElementById("inicio_sesion").addEventListener("click", (e) => {
         xhrobj = new XMLHttpRequest();
@@ -171,7 +170,10 @@ document.addEventListener("DOMContentLoaded", _ => {
         xhrobj.send("usuario="+encodeURIComponent(document.getElementById("regnomusu").value)+"&email="+encodeURIComponent(document.getElementById("regcorreo").value)+"&contrasena="+encodeURIComponent(document.getElementById("regpass").value));
     });
 
-    document.getElementById("inicio").addEventListener("click", _ => {});
+    document.getElementById("inicio").addEventListener("click", _ => {
+        location.href = "#inicio";
+        document.querySelector("body>header").scrollIntoView();
+    });
 
     document.getElementById("nueva-pub").addEventListener("click", _ => document.getElementById("nueva").focus() );
 
@@ -233,6 +235,23 @@ document.addEventListener("DOMContentLoaded", _ => {
         if (params.length) xhrobj.send(params.substring(0, params.length-1));
     });
 
+    document.getElementById("nuevo_foto_p").addEventListener("change", (e) => {
+        let idu = localStorage.getItem('usuario');
+        const formData = new FormData();
+        formData.append("archivo", e.target.files[0]);
+        xhrobj = new XMLHttpRequest();
+        xhrobj.open("POST", window.dominio+"/usuario_subir/"+idu);
+        xhrobj.withCredentials = true;
+        xhrobj.addEventListener("readystatechange", () => {
+            if (xhrobj.readyState == 4){
+                if (xhrobj.status == 204){
+                    rellenarTarjeta();
+                    location.href = "#principal";
+                } else alert("Error al cambiar la foto de perfil");
+            }
+        });
+        xhrobj.send(formData);
+    });
     document.getElementById("editnomusu").addEventListener("change", (e) => { window.nomusuCamb = true; });
     document.getElementById("editcorreo").addEventListener("change", (e) => { window.correoCamb = true; });
     document.getElementById("editpass").addEventListener("change", (e) => { window.passCamb = true; });
