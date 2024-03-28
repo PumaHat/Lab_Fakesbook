@@ -177,7 +177,31 @@ document.addEventListener("DOMContentLoaded", _ => {
 
     document.getElementById("nueva-pub").addEventListener("click", _ => document.getElementById("nueva").focus() );
 
-    document.getElementById("buscar-amigos").addEventListener("click", _ => {});
+    document.getElementById("buscar-amigos").addEventListener("click", _ => {
+        location.href = "#listaramigos";
+        let lista = document.querySelector("#p_listaramigos ul");
+        xhrobj = new XMLHttpRequest();
+        xhrobj.open("GET", window.dominio+"/usuario_listar");
+        xhrobj.addEventListener("readystatechange", () => {
+            if (xhrobj.readyState == 4){
+                if (xhrobj.status == 200){
+                    lista.textContent = "";
+                    for (let u of JSON.parse(xhrobj.response)){
+                        let li = document.createElement("li");
+                        let img = document.createElement("img");
+                        img.src = window.dominio + "/usuario_descargar/" + u.id;
+                        let usu = document.createElement("p");
+                        usu.textContent = u.usuario;
+                        let edo = document.createElement("p");
+                        edo.textContent = u.estado;
+                        li.append(img, usu, edo);
+                        lista.appendChild(li);
+                    }
+                } else alert("Error al obtener el listado de usuarios");
+            }
+        });
+        xhrobj.send();
+    });
 
     document.getElementById("cerrar-sesion").addEventListener("click", (e) => {
         xhrobj = new XMLHttpRequest();

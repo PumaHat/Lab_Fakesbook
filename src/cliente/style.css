@@ -30,6 +30,11 @@ h1, h2 {
     color: plum;
 }
 
+h1 a {
+    color: unset;
+    text-decoration: none;
+}
+
 button {
     border: none;
     background-color: #12339b;
@@ -104,6 +109,7 @@ article[hidden]{
     height: 100%;  
     float: left;
     padding-left: 5px;
+    object-fit: cover;
 }
 
 #p_principal{
@@ -126,6 +132,8 @@ article[hidden]{
     border-radius: 50%;
     width: 3rem;    
     grid-row: 1 / 3;
+    aspect-ratio: 1;
+    object-fit: cover;
 }
 
 .pub_contenido{
@@ -271,23 +279,29 @@ textarea{
     list-style-type: none;
     grid-template-rows: auto auto;
     grid-template-columns: auto 1fr;
-    gap: .5rem 1rem;
+    gap: 0 1rem;
+    margin-bottom: 1rem;
 }
 
 #p_listaramigos li img{
     grid-column: 1 / 2;
     grid-row: 1 / 3;
     height: 4rem;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
-#p_listaramigos li h3{
+#p_listaramigos li p:first-of-type{
     grid-column: 2 / 3;
     grid-row: 1 / 2;
     margin: 0;
     padding-left: 0;
+    font-weight: bold;
+    font-size: larger;
 }
 
-#p_listaramigos li p{
+#p_listaramigos li p:last-of-type{
     grid-column: 2 / 3;
     grid-row: 2 / 3;
     margin: 0;
