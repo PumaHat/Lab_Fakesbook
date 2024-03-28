@@ -1,6 +1,10 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponse
+
+from io import StringIO
+import os
 
 from usuarios.models import Perfil
 
@@ -15,7 +19,7 @@ def sesion_iniciar(request):
         usuario = authenticate(username=request.POST['usuario'], password=request.POST['contrasena'])
         if usuario:
             login(request, usuario)
-            return JsonResponse({'usuario': usuario.username}, status=201)
+            return JsonResponse({'id': usuario.id, 'usuario': usuario.username}, status=201)
         else:
             return HttpResponse(status=403)
     except:
@@ -50,20 +54,22 @@ def usuario_crear(request):
         nuevo.set_password(request.POST['contrasena'])
         nuevo.full_clean()
         nuevo_p = Perfil()
-        nuevo_p.genero = request.POST['genero']
-        nuevo_p.genero_otro = request.POST['genero_otro']
-        nuevo_p.biografia = request.POST['biografia']
-        nuevo_p.estado = request.POST['estado']
-        nuevo_p.full_clean()
+        nuevo_p.genero = request.POST.get('genero', 0)
+        nuevo_p.genero_otro = request.POST.get('genero_otro')
+        nuevo_p.biografia = request.POST.get('biografia')
+        nuevo_p.estado = request.POST.get('estado')
         nuevo.save()
+        nuevo_p.usuario = nuevo
+        nuevo_p.full_clean()
         nuevo_p.save()
         return HttpResponse(status=201)
-    except:
+    except Exception as e:
+        print(e.error_dict)
         return HttpResponse(status=400)
 
 def usuario_ver(request, **kwargs):
     try:
-        usuario = Perfil.objects.get(pk=kwargs['int'])
+        u = Perfil.objects.get(pk=kwargs['int'])
     except:
         return HttpResponse(status=400)
     obj = {
@@ -82,7 +88,8 @@ def usuario_descargar(request, **kwargs):
         arch = open(os.path.join(settings.MEDIA_PROFILE_ROOT, str(kwargs['int'])), "rb")
         return HttpResponse(arch.read(), status=200, content_type='application/octet-stream')
     except Exception as e:
-        return HttpResponse(status=500)
+        arch = StringIO('<?xml version="1.0"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="340" height="340">\n<path fill="#fff" d="m169,.5a169,169 0 1,0 2,0zm0,86a76,76 0 1\n1-2,0zM57,287q27-35 67-35h92q40,0 67,35a164,164 0 0,1-226,0"/>\n</svg>')
+        return HttpResponse(arch.read(), status=200, content_type='image/svg+xml')
 
 def usuario_subir(request, **kwargs):
     if not request.user:
@@ -130,7 +137,11 @@ def usuario_editar(request, **kwargs):
     if 'estado' in request.POST:
         perfil.estado = request.POST['estado']
 
-    perfil.full_clean()
-    perfil.usuario.full_clean()
-    perfil.usuario.save()
-    perfil.save()
+    try:
+        perfil.full_clean()
+        perfil.usuario.full_clean()
+        perfil.usuario.save()
+        perfil.save()
+        return HttpResponse(status=204)
+    except:
+        return HttpResponse(status=420)

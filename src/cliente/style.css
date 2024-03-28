@@ -165,12 +165,12 @@ article[hidden]{
     grid-column: 2 / 3;
 }
 
-.comentarios{
+.comentarios_crear{
     display: flex;
     align-items: center;
 }
 
-.comentarios textarea{
+.comentarios_crear textarea{
     flex-grow: 1;
 }
 
@@ -207,8 +207,8 @@ textarea{
 #perfil{
     display: grid;
     grid-template-areas: "foto nombre"
-                        "biografía biografía"
-                        "estado estado";
+                         "biografía biografía"
+                         "estado estado";
     border-top: 25px solid #dda0dd8f;
     padding-top: 10px;
     position: fixed;
@@ -232,6 +232,7 @@ textarea{
 #foto_p{ 
     grid-area: foto;
 }
+#edit_foto_p{max-width: 10rem;}
 #info{grid-area: foto;}
 #bio{
     grid-area: biografía;
@@ -248,4 +249,75 @@ textarea{
 
 #editgenero:has(option[value=otro]:not(:checked)) + #editgenerootro{
   display: none;
+}
+
+#editbio{ height: 3rem; }
+
+#p_listaramigos .cajita{
+    margin-inline: auto;
+    display: block;
+}
+
+#p_listaramigos ul{
+    padding-left: 0;
+}
+
+#p_listaramigos li{
+    display: grid;
+    list-style-type: none;
+    grid-template-rows: auto auto;
+    grid-template-columns: auto 1fr;
+    gap: .5rem 1rem;
+}
+
+#p_listaramigos li img{
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+    height: 4rem;
+}
+
+#p_listaramigos li h3{
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    margin: 0;
+    padding-left: 0;
+}
+
+#p_listaramigos li p{
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    margin: 0;
+}
+
+@keyframes temblorina{
+    0% { transform: rotate(0deg) scale(1.25); }
+    25% { transform: rotate(10deg) scale(1.25); }
+    50% { transform: rotate(0deg) scale(1.25); }
+    75% { transform: rotate(-10deg) scale(1.25); }
+    100% { transform: rotate(0deg) scale(1.25); }
+}
+
+#emoji-lista{
+    position: absolute;
+    display: none;
+    background: white;
+    border-radius: 2rem;
+}
+
+#emoji-lista.mostrado{
+    display: inline-block;
+}
+
+#emoji-lista button{
+    margin-inline: 0;
+    background: transparent;
+    font-size: 1.5rem;
+}
+
+#emoji-lista button:hover{
+    animation: temblorina .4s infinite;
+}
+
+#emoji-lista button:active{
+    border: none;
 }

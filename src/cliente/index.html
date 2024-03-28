@@ -8,8 +8,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marhey:wght@300..700&family=PT+Sans+Narrow:wght@400;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <script src="script.js"></script>
 </head>
 <body>
+
     <header>
         <h1>Fakesbook</h1>
     </header>
@@ -22,11 +25,11 @@
             </div>
             <div>
                 <label for="password">Contraseña:</label>
-                <input type="text" id="password" placeholder="Ingresa tu contraseña">
+                <input type="password" id="password" placeholder="Ingresa tu contraseña">
             </div>
             <div>
                 <button id="inicio_sesion">Iniciar sesión</button>
-                <button id="registrar usuario">Registrarse</button>
+                <button id="registrar_usuario">Registrarse</button>
             </div>
         </div>
         <div class="cajita">
@@ -42,9 +45,9 @@
             <label for="regcorreo">Correo electrónico: </label>
             <input type="text" name="email" id="regcorreo" placeholder="ilovecatnip@yahoo.com">
             <label for="regpass">Contraseña: </label>
-            <input type="password" name="contrasena" id="regpass" placeholder="********">
+            <input type="password" name="contrasena" id="regpass" placeholder="********"><br />
             <div>
-                <button id="enviaregistro">Registar</button>
+                <button id="enviaregistro">Registrar</button>
             </div>
         </div>
     </article>
@@ -52,16 +55,16 @@
     <article id="p_principal" hidden>
         <section id="contenedor_herramientas">
             <div id="b_herramientas">
-                <span title="Inicio" class="material-symbols-outlined">
+                <span title="Inicio" class="material-symbols-outlined" id="inicio">
                     home
                 </span>
-                <span title="Nueva publicación" class="material-symbols-outlined">
+                <span title="Nueva publicación" class="material-symbols-outlined" id="nueva-pub">
                     draw
                 </span>
-                <span title="Buscar amigos" class="material-symbols-outlined">
+                <span title="Buscar amigos" class="material-symbols-outlined" id="buscar-amigos">
                     search
                 </span>
-                <span title="Cerrar sesión" class="material-symbols-outlined">
+                <span title="Cerrar sesión" class="material-symbols-outlined" id="cerrar-sesion">
                     logout
                 </span>
             </div>
@@ -86,57 +89,40 @@
                 </header>
                 <div class="pub_contenido">
                     <p>bla bla bla
-                        bla bla bla
-                        bla bla bla
+                       bla bla bla
+                       bla bla bla
                     </p>
                     <img src="avatar.png" alt="foto de la publicación">
                     <img src="avatar.png" alt="foto de la publicación">
                 </div>
                 <div class="comentarios">
-                    <textarea name="comm" placeholder="comentarios"></textarea>
-                    <button>Comentar</button>
-                </div>
-            </article>
-            <article class="publicacion">
-                <header>
-                    <img src="avatar.png" alt="usuario sin foto" class="foto_pub">
-                    <input type="file" hidden>
-                    <h4> gatito malo</h4>
-                    <time>Feb. 25, 2024, 8:26 p.m.</time>
-                </header>
-                <div class="pub_contenido">
-                    <p>bla bla bla
-                        bla bla bla
-                        bla bla bla
-                    </p>
-                    <img src="avatar.png" alt="foto de la publicación">
-                    <img src="avatar.png" alt="foto de la publicación">
-                </div>
-                <div class="comentarios">
-                    <textarea name="comm" placeholder="comentarios"></textarea>
-                    <button>Comentar</button>
+                    <div class="comentarios_crear">
+                        <textarea name="comm" placeholder="Comentario"></textarea>
+                        <button>Comentar</button>
+                    </div>
                 </div>
             </article>
         </section>
-       
+
         <section id="perfil">
-            <img src="avatar.png" alt="usuario sin foto" id="foto_p">
-            <input type="file" hidden>    
+            <img id="foto_p">
+            <input type="file" hidden>
             
             <div id="info">
-                <h3>Gatitolector23</h3>
-                <p id="genero"> Género: <span>otro</span></p>
+                <h3></h3>
+                <p id="genero">Género: <span></span></p>
             </div>
             
-            <p id="bio">Biografía: <span>no hay nada como una lechita y un buen libro</span></p>
-            <p id="est">Estado: <span>hambriento de cultura</span></p>
+            <p id="bio">Biografía: <span></span></p>
+            <p id="est">Estado: <span></span></p>
+            <div><button id="btn_editar_perfil">Editar</button></div>
         </section>
     </article>
 
     <article id="p_editarperfil" hidden>
         <div class="cajitacomentarios">
             <h2>Editar perfil</h2>
-            <img src="avatar.png" alt="usuario sin foto" id="edit_foto_p">
+            <div><img id="edit_foto_p"></div>
             <div>
                 <label for="editnomusu">Nombre de usuario: </label>
                 <input type="text" name="usuario" id="editnomusu" placeholder="gatitolector23">
@@ -152,6 +138,7 @@
             <div>
                 <label for="editgenero">Género: </label>
                 <select id="editgenero">
+                    <option value="_" selected>Escoge</option>
                     <option value="masc">Masculino</option>
                     <option value="fem">Femenino</option>
                     <option value="otro">Otro</option>
@@ -160,10 +147,10 @@
             </div>
             <div style="display: flex; gap: 6px;">
                 <label for="editbio">Biografía: </label>
-                <textarea name="biografia" id="editbio" style="height: 3rem" placeholder="..."></textarea>
+                <textarea name="biografia" id="editbio" placeholder="..."></textarea>
             </div>
             <div>
-                <label for="edittext">Estado: </label>
+                <label for="editestado">Estado: </label>
                 <input type="text" name="estado" id="editestado" placeholder="Feli :)">
             </div>
 
@@ -172,6 +159,31 @@
             </div>
         </div>
     </article>
+
+    <article id="p_listaramigos" hidden>
+        <div class="cajita">
+            <h2>Listar amigos</h2>
+            <ul>
+                <li>
+                    <img src="avatar.png" alt="usuario sin foto">
+                    <h3>gatito malo</h3>
+                    <p>Lorem ipsum dolor sit amet...</p>
+                </li>
+            </ul>
+        </div>
+    </article>
+
+    <!--Elementos complementarios-->
+    <div id="emoji-lista">
+        <button id="reacc-gusto"><span>👍</span></button>
+        <button id="reacc-encanto"><span>💜</span></button>
+        <button id="reacc-empatia"><span>🥰</span></button>
+        <button id="reacc-risa"><span>😅</span></button>
+        <button id="reacc-asombro"><span>😮</span></button>
+        <button id="reacc-tristeza"><span>😢</span></button>
+        <button id="reacc-enojo"><span>😡</span></button>
+        <button id="reacc-aburrimiento"><span>🙄</span></button>
+    </div>
 
 </body>
 </html>
