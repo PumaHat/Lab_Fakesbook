@@ -1,0 +1,13 @@
+services:
+  cliente:
+    build:
+      context: .
+      dockerfile: cliente.Dockerfile
+    ports:
+      - "8000:8000"
+  servidor:
+    build:
+      context: .
+      dockerfile: servidor.Dockerfile
+    ports:
+      - "8001:8001"
