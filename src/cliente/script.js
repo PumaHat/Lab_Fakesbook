@@ -104,8 +104,7 @@ function borrarComentario(e){
                 else alert("Error al borrar un comentario");
             }
         });
-        xhrobj.send("texto="+encodeURIComponent(e.target.previousElementSibling.value));
-
+        xhrobj.send();
     } else {
         // Entrar a modo cancelar edición
         e.target.textContent = "delete";
@@ -117,11 +116,11 @@ function borrarComentario(e){
 }
 
 function editarComentario(e){
+    let c = e.target.previousElementSibling;
     if (e.target.textContent == "edit"){
         // Entrar a modo edición
         e.target.textContent = "save";
         e.target.nextElementSibling.textContent = "cancel";
-        let c = e.target.previousElementSibling;
         c.dataset.prev = c.textContent;
         c.contentEditable = true;
         c.focus();
@@ -137,16 +136,15 @@ function editarComentario(e){
                 if (xhrobj.status == 204){
                     e.target.textContent = "edit";
                     e.target.nextElementSibling.textContent = "delete";
-                    e.target.previousElementSibling.contentEditable = false;
+                    c.contentEditable = false;
                 } else {
                     alert("Error al editar un comentario");
-                    e.target.previousElementSibling.focus();
+                    c.focus();
                 }
             }
         });
-        let c = e.target.previousElementSibling;
         c.textContent = c.innerHTML.replaceAll("<br>", "\n");
-        xhrobj.send("texto="+encodeURIComponent(e.target.previousElementSibling.textContent));
+        xhrobj.send("texto="+encodeURIComponent(c.textContent));
     }
 }
 
@@ -193,6 +191,65 @@ function dibujarComentario(obj){
     return com;
 }
 
+function borrarPublicacion(e){
+    if (e.target.textContent == "delete"){
+        // Entar a modo borrar
+        let pid = e.target.parentNode.parentNode.dataset.id;
+        let xhrobj = new XMLHttpRequest();
+        xhrobj.open("POST", window.dominio+"/publicacion_borrar/"+pid);
+        xhrobj.withCredentials = true;
+        xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhrobj.addEventListener("readystatechange", () => {
+            if (xhrobj.readyState == 4){
+                if (xhrobj.status == 204)
+                    e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode);
+                else alert("Error al borrar la publicación");
+            }
+        });
+        xhrobj.send();
+    } else {
+        // Entrar a modo cancelar edición
+        e.target.textContent = "delete";
+        e.target.previousElementSibling.textContent = "edit";
+        let c = e.target.parentNode.nextElementSibling.children[0];
+        c.textContent = c.dataset.prev;
+        c.contentEditable = false;
+    }
+}
+
+function editarPublicacion(e){
+    let c = e.target.parentNode.nextElementSibling.children[0];
+    if (e.target.textContent == "edit"){
+        // Entrar a modo edición
+        e.target.textContent = "save";
+        e.target.nextElementSibling.textContent = "cancel";
+        c.dataset.prev = c.textContent;
+        c.contentEditable = true;
+        c.focus();
+    } else {
+        // Entrar a modo guardado
+        let pid = e.target.parentNode.parentNode.dataset.id;
+        let xhrobj = new XMLHttpRequest();
+        xhrobj.open("POST", window.dominio+"/publicacion_editar/"+pid);
+        xhrobj.withCredentials = true;
+        xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhrobj.addEventListener("readystatechange", () => {
+            if (xhrobj.readyState == 4){
+                if (xhrobj.status == 204){
+                    e.target.textContent = "edit";
+                    e.target.nextElementSibling.textContent = "delete";
+                    c.contentEditable = false;
+                } else {
+                    alert("Error al editar la publicación");
+                    c.focus();
+                }
+            }
+        });
+        c.textContent = c.innerHTML.replaceAll("<br>", "\n");
+        xhrobj.send("texto="+encodeURIComponent(c.textContent));
+    }
+}
+
 function dibujarPublicacion(obj){
     let publi = document.createElement("article");
     publi.className = "publicacion";
@@ -208,7 +265,19 @@ function dibujarPublicacion(obj){
     h4.textContent = obj.usuario;
     let time = document.createElement("time");
     time.textContent = (new Date(obj.fecha)).toLocaleString();
-    header.append(img, input, h4, time);
+    let edit = document.createElement("span");
+    edit.className = "material-symbols-outlined";
+    edit.textContent = "edit";
+    edit.addEventListener("click", editarPublicacion);
+    let borr = document.createElement("span");
+    borr.className = "material-symbols-outlined";
+    borr.textContent = "delete";
+    borr.addEventListener("click", borrarPublicacion);
+    if (parseInt(localStorage.getItem("usuario")) != obj.usuario_id){
+        edit.hidden = true;
+        borr.hidden = true;
+    }
+    header.append(img, input, h4, time, edit, borr);
     let contenido = document.createElement("div");
     contenido.className = "pub_contenido";
     let contenidoP = document.createElement("p");

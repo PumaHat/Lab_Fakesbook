@@ -92,20 +92,26 @@ def publicacion_editar(request, **kwargs):
         publicacion = Publicacion.objects.get(pk=kwargs['int'])
     except:
         return HttpResponse(status=400)
-    if not request.user.pk == publicacion.perfil.usuario.pk:
+    if not request.user.pk == publicacion.usuario.usuario.pk:
         return HttpResponse(status=403)
     if 'texto' in request.POST:
         publicacion.texto = request.POST['texto']
-
-    publicacion.full_clean()
-    publicacion.save()
+    try:
+        publicacion.full_clean()
+        publicacion.save()
+    except:
+        return HttpResponse(status=500)
+    return HttpResponse(status=204)
 
 def publicacion_borrar(request, **kwargs):
+    if not request.user:
+        return HttpResponse(status=401)
     try:
         publicacion = Publicacion.objects.get(pk=kwargs['int'])
     except:
         return HttpResponse(status=400)
-    # FIX: implementar seguridad
+    if not request.user.pk == publicacion.usuario.usuario.pk:
+        return HttpResponse(status=403)
     try:
         publicacion.delete()
         archivo = os.path.join(settings.MEDIA_POSTS_ROOT, str(publicacion.pk))
