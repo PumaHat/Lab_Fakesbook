@@ -141,6 +141,10 @@ article[hidden]{
     margin-bottom: 16px;
 }
 
+.pub_contenido img {
+    max-width: 29rem;
+}
+
 #nueva_pub{
     display: flex;
     align-items: center;
@@ -242,7 +246,12 @@ textarea{
 #foto_p{
     grid-area: foto;
 }
-#edit_foto_p{max-width: 10rem;}
+#edit_foto_p{
+    width: 10rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    object-fit: cover;
+}
 #info{grid-area: nombre;}
 #bio{
     grid-area: biografía;
@@ -255,6 +264,22 @@ textarea{
     background-color: #dda0dd8f;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+}
+
+[for="nuevo_foto_p"]{
+    position: relative;
+}
+[for="nuevo_foto_p"]:hover::after{
+    width: 10rem;
+    height: 5.5rem;
+    content: "Cambiar foto";
+    background: #000a;
+    position: absolute;
+    color: white;
+    border-radius: 50%;
+    padding-top: 4.5rem;
+    top: -9rem;
+    left: 0;
 }
 
 #env_btn_editar_perfil {grid-area: btn;}

@@ -6,6 +6,8 @@ from django.http import JsonResponse, HttpResponse
 from usuarios.models import Perfil
 from publicaciones.models import Publicacion, Comentario, Reaccion
 
+import os
+
 def publicacion_listar(request):
     obj = []
     try:
@@ -16,7 +18,8 @@ def publicacion_listar(request):
         obj.append({
             'id': p.pk,
             'texto': p.texto,
-            'usuario': p.usuario.username,
+            'usuario_id': p.usuario.pk,
+            'usuario': p.usuario.usuario.username,
             'archivo': p.archivo,
             'fecha': p.fecha,
             'reacciones': p.reacciones
@@ -29,11 +32,12 @@ def publicacion_crear(request):
     try:
         nuevo = Publicacion()
         nuevo.texto = request.POST['texto']
-        nuevo.usuario = request.user
+        nuevo.usuario = request.user.perfil
         nuevo.full_clean()
         nuevo.save()
-        return HttpResponse(status=201)
-    except:
+        return JsonResponse({'id': nuevo.id}, status=201)
+    except Exception as e:
+        raise e
         return HttpResponse(status=400)
 
 def publicacion_ver(request, **kwargs):
@@ -44,7 +48,8 @@ def publicacion_ver(request, **kwargs):
     obj = {
         'id': p.pk,
         'texto': p.texto,
-        'usuario': p.usuario.username,
+        'usuario_id': p.usuario.pk,
+        'usuario': p.usuario.usuario.username,
         'archivo': p.archivo,
         'fecha': p.fecha,
         'reacciones': p.reacciones
@@ -67,17 +72,18 @@ def publicacion_subir(request, **kwargs):
         publicacion = Publicacion.objects.get(pk=kwargs['int'])
     except:
         return HttpResponse(status=400)
-    if not request.user.pk == publicacion.perfil.usuario.pk:
+    if not request.user.pk == publicacion.usuario.pk:
         return HttpResponse(status=403)
     try:
         publicacion.archivo = True
         publicacion.save()
         data=request.FILES['archivo']
-        with open(os.path.join(settings.MEDIA_POSTS_ROOT, str(nuevo.pk)), "wb") as f:
+        with open(os.path.join(settings.MEDIA_POSTS_ROOT, str(publicacion.pk)), "wb") as f:
             for chunk in data.chunks():
                 f.write(chunk)
         return HttpResponse(status=200)
-    except:
+    except Exception as e:
+        raise e
         return HttpResponse(status=500)
 
 def publicacion_editar(request, **kwargs):
@@ -100,6 +106,7 @@ def publicacion_borrar(request, **kwargs):
         publicacion = Publicacion.objects.get(pk=kwargs['int'])
     except:
         return HttpResponse(status=400)
+    # FIX: implementar seguridad
     try:
         publicacion.delete()
         archivo = os.path.join(settings.MEDIA_POSTS_ROOT, str(publicacion.pk))

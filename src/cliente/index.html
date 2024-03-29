@@ -71,13 +71,13 @@
             <h2>Publicaciones</h2>
             <article class="publicacion" id="nueva_pub">
                 <img src="avatar.png" alt="usuario sin foto" class="foto_pub">
-                <input type="file" hidden>
                 <textarea id="nueva" placeholder="¿Qué estás pensando?"></textarea>
-                <span class="material-symbols-outlined">
+                <label for="nueva_archivo" class="material-symbols-outlined">
                     add_photo_alternate
-                </span>
-                <button>Publicar</button>
-            </article>
+                </label>
+                <input id="nueva_archivo" type="file" accept="image/*" hidden>
+                <button id="publicar">Publicar</button>
+            </article><!--
             <article class="publicacion">
                 <header>
                     <img src="avatar.png" alt="usuario sin foto" class="foto_pub">
@@ -99,7 +99,7 @@
                         <button>Comentar</button>
                     </div>
                 </div>
-            </article>
+            </article>-->
         </section>
 
         <section id="perfil">

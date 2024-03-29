@@ -17,29 +17,35 @@ function dibujarComentario(obj){
     p.textContent = "#";
     let reacc = document.createElement("button");
     reacc.textContent = "";
+    com.append(img, p, reacc);
+    return com;
 }
 
 function dibujarPublicacion(obj){
     let publi = document.createElement("article");
     publi.className = "publicacion";
+    publi.dataset.id = obj.id;
     let header = document.createElement("header");
     let img = document.createElement("img");
-    img.src = "#";
+    img.src = window.dominio + "/usuario_descargar/" + obj.usuario_id;
     img.className = "foto_pub";
     let input = document.createElement("input");
     input.setAttribute("type", "file");
     input.hidden = true;
     let h4 = document.createElement("h4");
-    h4.textContent = "#";
-    let time = (new Date()).toLocaleString();
+    h4.textContent = obj.usuario;
+    let time = (new Date(obj.fecha)).toLocaleString();
     header.append(img, input, h4, time);
     let contenido = document.createElement("div");
     contenido.className = "pub_contenido";
-    let contenidoElems = [];
     let contenidoP = document.createElement("p");
-    //
-    contenidoElems.append(contenidoP);
-    //for (let i = 0; )
+    contenidoP.textContent = obj.texto
+    contenido.appendChild(contenidoP);
+    if (obj.archivo){
+        let archivo = document.createElement("img");
+        archivo.src = window.dominio + "/publicacion_descargar/" + obj.id;
+        contenido.appendChild(archivo);
+    }
     let comentarios = document.createElement("div");
     comentarios.className = "comentarios";
     let comentarios_crear = document.createElement("div");
@@ -55,6 +61,7 @@ function dibujarPublicacion(obj){
     //for (let i = 0; )
     // comentarios.append(...comentariosElems);
     publi.append(header, contenido, comentarios);
+    return publi;
 }
 
 function rellenarTarjeta(){
@@ -64,7 +71,7 @@ function rellenarTarjeta(){
     document.getElementById("foto_p").src = srcimg;
     document.getElementById("edit_foto_p").src = srcimg;
     document.querySelector("#nueva_pub .foto_pub").src = srcimg;
-    xhrobj = new XMLHttpRequest();
+    let xhrobj = new XMLHttpRequest();
     xhrobj.open("GET", window.dominio+"/usuario_ver/"+idu);
     xhrobj.addEventListener("readystatechange", () => {
         if (xhrobj.readyState == 4){
@@ -115,22 +122,41 @@ function cambiarPagina(){
         if (ant) ant.hidden = true;
         p.hidden = false;
     } else console.error(pagina + " no existe!");
+    if (pagina=="principal"){
+        rellenarTarjeta();
+        let ult = document.getElementById("nueva_pub").nextElementSibling;
+        while (ult){
+            let nuevoUlt = ult.nextElementSibling;
+            ult.parentNode.removeChild(ult);
+            ult = nuevoUlt;
+        }
+        ult = document.getElementById("nueva_pub").parentNode;
+        let xhrobj = new XMLHttpRequest();
+        xhrobj.open("GET", window.dominio+"/publicacion_listar");
+        xhrobj.addEventListener("readystatechange", () => {
+            if (xhrobj.readyState == 4){
+                if (xhrobj.status == 200){
+                    for (let u of JSON.parse(xhrobj.response)){
+                        ult.appendChild(dibujarPublicacion(u));
+                    }
+                } else alert("Error al obtener el listado de publicaciones");
+            }
+        });
+        xhrobj.send();
+    }
 }
 
 window.addEventListener("popstate", cambiarPagina);
 
 document.addEventListener("DOMContentLoaded", _ => {
-    window.xhrobj = null;
     let nomusu = localStorage.getItem("usuario");
-    if (nomusu){
-        rellenarTarjeta();
-        history.pushState(null, null, "#principal");
-    } else history.pushState(null, null, "#sesion");
+    if (nomusu) history.pushState(null, null, "#principal");
+    else history.pushState(null, null, "#sesion");
     cambiarPagina();
 
     /* Eventos de botones */
     document.getElementById("inicio_sesion").addEventListener("click", (e) => {
-        xhrobj = new XMLHttpRequest();
+        let xhrobj = new XMLHttpRequest();
         xhrobj.open("POST", window.dominio+"/sesion_iniciar");
         xhrobj.withCredentials = true;
         xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -138,10 +164,9 @@ document.addEventListener("DOMContentLoaded", _ => {
             if (xhrobj.readyState == 4){
                 if (xhrobj.status == 201){
                     let obj = JSON.parse(xhrobj.response);
+                    localStorage.setItem("usuario", obj.id);
                     history.pushState(null, null, "#principal");
                     cambiarPagina();
-                    localStorage.setItem("usuario", obj.id);
-                    rellenarTarjeta();
                 } else if (xhrobj.status == 403) alert("Credenciales incorrectas");
                 else alert("Error al iniciar sesión");
             }
@@ -155,7 +180,7 @@ document.addEventListener("DOMContentLoaded", _ => {
     });
 
     document.getElementById("enviaregistro").addEventListener("click", (e) => {
-        xhrobj = new XMLHttpRequest();
+        let xhrobj = new XMLHttpRequest();
         xhrobj.open("POST", window.dominio+"/usuario_crear");
         xhrobj.withCredentials = true;
         xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -180,7 +205,7 @@ document.addEventListener("DOMContentLoaded", _ => {
     document.getElementById("buscar-amigos").addEventListener("click", _ => {
         location.href = "#listaramigos";
         let lista = document.querySelector("#p_listaramigos ul");
-        xhrobj = new XMLHttpRequest();
+        let xhrobj = new XMLHttpRequest();
         xhrobj.open("GET", window.dominio+"/usuario_listar");
         xhrobj.addEventListener("readystatechange", () => {
             if (xhrobj.readyState == 4){
@@ -204,7 +229,7 @@ document.addEventListener("DOMContentLoaded", _ => {
     });
 
     document.getElementById("cerrar-sesion").addEventListener("click", (e) => {
-        xhrobj = new XMLHttpRequest();
+        let xhrobj = new XMLHttpRequest();
         xhrobj.open("POST", window.dominio+"/sesion_cerrar");
         xhrobj.withCredentials = true;
         xhrobj.addEventListener("readystatechange", () => {
@@ -219,19 +244,49 @@ document.addEventListener("DOMContentLoaded", _ => {
         xhrobj.send();
     });
 
+    document.getElementById("publicar").addEventListener("click", (e) => {
+        let idu = localStorage.getItem('usuario');
+        let xhrobj = new XMLHttpRequest();
+        xhrobj.open("POST", window.dominio+"/publicacion_crear");
+        xhrobj.withCredentials = true;
+        xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhrobj.addEventListener("readystatechange", () => {
+            if (xhrobj.readyState == 4){
+                if (xhrobj.status == 201){
+                    let obj = JSON.parse(xhrobj.response);
+                    let archivos = document.getElementById("nueva_archivo").files;
+                    if (archivos.length){
+                        const formData = new FormData();
+                        formData.append("archivo", archivos[0]);
+                        let xhrobj2 = new XMLHttpRequest();
+                        xhrobj2.open("POST", window.dominio+"/publicacion_subir/"+obj.id);
+                        xhrobj2.withCredentials = true;
+                        xhrobj2.addEventListener("readystatechange", () => {
+                            if (xhrobj2.readyState == 4){
+                                if (xhrobj2.status == 200) location.reload();
+                                else alert("Error al subir la foto de la publicación");
+                            }
+                        });
+                        xhrobj2.send(formData);
+                    } else location.reload();
+                } else alert("Error al crear una publicación");
+            }
+        });
+        xhrobj.send("texto="+encodeURIComponent(document.getElementById("nueva").value));
+    });
+
     document.getElementById("btn_editar_perfil").addEventListener("click", (e) => {
         location.href = "#editarperfil";
     });
     document.getElementById("enviaredit").addEventListener("click", (e) => {
         let idu = localStorage.getItem('usuario');
-        xhrobj = new XMLHttpRequest();
+        let xhrobj = new XMLHttpRequest();
         xhrobj.open("POST", window.dominio+"/usuario_editar/"+idu);
         xhrobj.withCredentials = true;
         xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhrobj.addEventListener("readystatechange", () => {
             if (xhrobj.readyState == 4){
                 if (xhrobj.status == 204){
-                    rellenarTarjeta();
                     location.href = "#principal";
                     window.nomusuCamb = undefined;
                     window.correoCamb = undefined;
@@ -263,13 +318,12 @@ document.addEventListener("DOMContentLoaded", _ => {
         let idu = localStorage.getItem('usuario');
         const formData = new FormData();
         formData.append("archivo", e.target.files[0]);
-        xhrobj = new XMLHttpRequest();
+        let xhrobj = new XMLHttpRequest();
         xhrobj.open("POST", window.dominio+"/usuario_subir/"+idu);
         xhrobj.withCredentials = true;
         xhrobj.addEventListener("readystatechange", () => {
             if (xhrobj.readyState == 4){
                 if (xhrobj.status == 204){
-                    rellenarTarjeta();
                     location.href = "#principal";
                 } else alert("Error al cambiar la foto de perfil");
             }
