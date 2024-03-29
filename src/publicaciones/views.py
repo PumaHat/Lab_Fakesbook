@@ -159,19 +159,26 @@ def comentario_editar(request, **kwargs):
         comentario = Comentario.objects.get(pk=kwargs['int'])
     except:
         return HttpResponse(status=400)
-    if not request.user.pk == comentario.perfil.usuario.pk:
+    if not request.user.pk == comentario.usuario.pk:
         return HttpResponse(status=403)
-    if 'texto' in request.POST:
-        comentario.texto = request.POST['texto']
-
-    comentario.full_clean()
-    comentario.save()
+    try:
+        if 'texto' in request.POST:
+            comentario.texto = request.POST['texto']
+        comentario.full_clean()
+        comentario.save()
+    except:
+        return HttpResponse(status=500)
+    return HttpResponse(status=204)
 
 def comentario_borrar(request, **kwargs):
+    if not request.user:
+        return HttpResponse(status=401)
     try:
         comentario = Comentario.objects.get(pk=kwargs['int'])
     except:
         return HttpResponse(status=400)
+    if not request.user.pk == comentario.usuario.pk:
+        return HttpResponse(status=403)
     try:
         comentario.delete()
     except:

@@ -6,9 +6,66 @@ window.dominio = urldom.origin;
 
 function reaccionar(e){}
 
-function borrarComentario(e){}
+function borrarComentario(e){
+    if (e.target.textContent == "delete"){
+        // Entar a modo borrar
+        let pid = e.target.parentNode.dataset.id;
+        let xhrobj = new XMLHttpRequest();
+        xhrobj.open("POST", window.dominio+"/comentario_borrar/"+pid);
+        xhrobj.withCredentials = true;
+        xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhrobj.addEventListener("readystatechange", () => {
+            if (xhrobj.readyState == 4){
+                if (xhrobj.status == 204)
+                    e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+                else alert("Error al borrar un comentario");
+            }
+        });
+        xhrobj.send("texto="+encodeURIComponent(e.target.previousElementSibling.value));
 
-function editarComentario(e){}
+    } else {
+        // Entrar a modo cancelar edición
+        e.target.textContent = "delete";
+        e.target.previousElementSibling.textContent = "edit";
+        let c = e.target.previousElementSibling.previousElementSibling;
+        c.textContent = c.dataset.prev;
+        c.contentEditable = false;
+    }
+}
+
+function editarComentario(e){
+    if (e.target.textContent == "edit"){
+        // Entrar a modo edición
+        e.target.textContent = "save";
+        e.target.nextElementSibling.textContent = "cancel";
+        let c = e.target.previousElementSibling;
+        c.dataset.prev = c.textContent;
+        c.contentEditable = true;
+        c.focus();
+    } else {
+        // Entrar a modo guardado
+        let pid = e.target.parentNode.dataset.id;
+        let xhrobj = new XMLHttpRequest();
+        xhrobj.open("POST", window.dominio+"/comentario_editar/"+pid);
+        xhrobj.withCredentials = true;
+        xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhrobj.addEventListener("readystatechange", () => {
+            if (xhrobj.readyState == 4){
+                if (xhrobj.status == 204){
+                    e.target.textContent = "edit";
+                    e.target.nextElementSibling.textContent = "delete";
+                    e.target.previousElementSibling.contentEditable = false;
+                } else {
+                    alert("Error al editar un comentario");
+                    e.target.previousElementSibling.focus();
+                }
+            }
+        });
+        let c = e.target.previousElementSibling;
+        c.textContent = c.innerHTML.replaceAll("<br>", "\n");
+        xhrobj.send("texto="+encodeURIComponent(e.target.previousElementSibling.textContent));
+    }
+}
 
 function crearComentario(e){
     let pid = e.target.parentNode.parentNode.parentNode.dataset.id;
@@ -40,9 +97,11 @@ function dibujarComentario(obj){
     let edit = document.createElement("span");
     edit.className = "material-symbols-outlined";
     edit.textContent = "edit";
+    edit.addEventListener("click", editarComentario);
     let borr = document.createElement("span");
     borr.className = "material-symbols-outlined";
     borr.textContent = "delete";
+    borr.addEventListener("click", borrarComentario);
     com.append(img, nom, p, edit, borr);
     return com;
 }
