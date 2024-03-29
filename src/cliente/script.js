@@ -4,7 +4,90 @@ let urldom = new URL(document.location);
 urldom.port = "8001";
 window.dominio = urldom.origin;
 
-function reaccionar(e){}
+function dereaccionar(e){
+    let xhrobj = new XMLHttpRequest();
+    let pid = e.target.parentNode.parentNode.dataset.id;
+
+    xhrobj.open("POST", window.dominio+"/reaccion_borrar/"+pid);
+    xhrobj.withCredentials = true;
+    xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhrobj.addEventListener("readystatechange", () => {
+        if (xhrobj.readyState == 4){
+            if (xhrobj.status == 204){
+                let val = ["👍", "💜", "🥰", "😅", "😮", "😢", "😡", "🙄"].indexOf(e.target.textContent)+1;
+                let elemval = document.querySelector('.publicacion[data-id="'+pid+'"] .reacciones dd:nth-of-type('+val.toString()+')');
+                elemval.textContent = parseInt(elemval.textContent) - 1;
+                let btn = elemval.parentNode.nextElementSibling;
+                btn.classList.add("material-symbols-outlined");
+                btn.textContent = "mood";
+                btn.title = "Reaccionar";
+            } else alert("Error al desreaccionar");
+        }
+    });
+    xhrobj.send();
+}
+
+function reaccionar(e){
+    let val = 0;
+    switch (e.target.parentNode.id){
+        case "reacc-gusto":
+            val = 1;
+            break;
+        case "reacc-encanto":
+            val = 2;
+            break;
+        case "reacc-empatia":
+            val = 3;
+            break;
+        case "reacc-risa":
+            val = 4;
+            break;
+        case "reacc-asombro":
+            val = 5;
+            break;
+        case "reacc-tristeza":
+            val = 6;
+            break;
+        case "reacc-enojo":
+            val = 7;
+            break;
+        case "reacc-aburrimiento":
+            val = 8;
+            break;
+    }
+    let xhrobj = new XMLHttpRequest();
+    let pid = e.target.parentNode.parentNode.dataset.id;
+    xhrobj.open("POST", window.dominio+"/reaccion_crear/"+pid);
+    xhrobj.withCredentials = true;
+    xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhrobj.addEventListener("readystatechange", () => {
+        if (xhrobj.readyState == 4){
+            if (xhrobj.status == 201){
+                let elemval = document.querySelector('.publicacion[data-id="'+pid+'"] .reacciones dd:nth-of-type('+val.toString()+')');
+                elemval.textContent = parseInt(elemval.textContent) + 1;
+                let btn = elemval.parentNode.nextElementSibling;
+                btn.classList.remove("material-symbols-outlined");
+                btn.textContent = elemval.previousElementSibling.textContent;
+                btn.title = "Quitar reacción";
+                e.target.parentNode.parentNode.classList.remove('mostrado');
+            } else alert("Error al reaccionar");
+        }
+    });
+    xhrobj.send("tipo="+val.toString());
+}
+
+function mostrarReaccion(e){
+    if (e.target.classList.contains("material-symbols-outlined")){
+        let medidas = e.target.getBoundingClientRect();
+        let lista = document.getElementById('emoji-lista');
+        lista.dataset.id = e.target.parentNode.parentNode.dataset.id;
+        lista.style.setProperty('left', (medidas.x + window.scrollX - medidas.width/2).toFixed().toString() + 'px');
+        lista.style.setProperty('top', (medidas.y + window.scrollY - medidas.height/2).toFixed().toString() + 'px');
+        lista.classList.add('mostrado');
+    } else {
+        dereaccionar(e);
+    }
+}
 
 function borrarComentario(e){
     if (e.target.textContent == "delete"){
@@ -102,6 +185,10 @@ function dibujarComentario(obj){
     borr.className = "material-symbols-outlined";
     borr.textContent = "delete";
     borr.addEventListener("click", borrarComentario);
+    if (parseInt(localStorage.getItem("usuario")) != obj.usuario_id){
+        edit.hidden = true;
+        borr.hidden = true;
+    }
     com.append(img, nom, p, edit, borr);
     return com;
 }
@@ -132,6 +219,41 @@ function dibujarPublicacion(obj){
         archivo.src = window.dominio + "/publicacion_descargar/" + obj.id;
         contenido.appendChild(archivo);
     }
+    let reacciones = document.createElement("div");
+    reacciones.className = "reacciones";
+    let lreacc = document.createElement("dl");
+    let emociones = ["👍", "💜", "🥰", "😅", "😮", "😢", "😡", "🙄"];
+    for (let r of emociones){
+        let lreacc_s = document.createElement("dt");
+        lreacc_s.textContent = r;
+        let lreacc_c = document.createElement("dd");
+        lreacc_c.textContent = "0";
+        lreacc.append(lreacc_s, lreacc_c);
+    }
+    let reaccbtn = document.createElement("span");
+    reaccbtn.className = "material-symbols-outlined";
+    reaccbtn.textContent = "mood";
+    reaccbtn.title = "Reaccionar";
+    reaccbtn.addEventListener("click", mostrarReaccion);
+    reacciones.append(lreacc, reaccbtn);
+    let xhrobj = new XMLHttpRequest();
+    xhrobj.open("GET", window.dominio+"/reaccion_listar/"+obj.id);
+    xhrobj.addEventListener("readystatechange", () => {
+        if (xhrobj.readyState == 4){
+            if (xhrobj.status == 200){
+                for (let u of JSON.parse(xhrobj.response)){
+                    let nodo = lreacc.children[1+2*(u.tipo-1)];
+                    nodo.textContent = parseInt(nodo.textContent)+1;
+                    if (localStorage.getItem("nombreusuario") == u.usuario){
+                        reaccbtn.classList.remove("material-symbols-outlined");
+                        reaccbtn.textContent = emociones[u.tipo-1];
+                        reaccbtn.title = "Quitar reacción";
+                    }
+                }
+            } else alert("Error al obtener el listado de reacciones");
+        }
+    });
+    xhrobj.send();
     let comentarios = document.createElement("div");
     comentarios.className = "comentarios";
     let comentarios_crear = document.createElement("div");
@@ -144,19 +266,19 @@ function dibujarPublicacion(obj){
     btnComentar.addEventListener("click", crearComentario);
     comentarios_crear.append(textArea, btnComentar);
     comentarios.append(comentarios_crear);
-    let xhrobj = new XMLHttpRequest();
-    xhrobj.open("GET", window.dominio+"/comentario_listar/"+obj.id);
-    xhrobj.addEventListener("readystatechange", () => {
-        if (xhrobj.readyState == 4){
-            if (xhrobj.status == 200){
-                for (let u of JSON.parse(xhrobj.response)){
+    let xhrobj2 = new XMLHttpRequest();
+    xhrobj2.open("GET", window.dominio+"/comentario_listar/"+obj.id);
+    xhrobj2.addEventListener("readystatechange", () => {
+        if (xhrobj2.readyState == 4){
+            if (xhrobj2.status == 200){
+                for (let u of JSON.parse(xhrobj2.response)){
                     comentarios.appendChild(dibujarComentario(u));
                 }
             } else alert("Error al obtener el listado de comentarios");
         }
     });
-    xhrobj.send();
-    publi.append(header, contenido, comentarios);
+    xhrobj2.send();
+    publi.append(header, contenido, reacciones, comentarios);
     return publi;
 }
 
@@ -261,6 +383,7 @@ document.addEventListener("DOMContentLoaded", _ => {
                 if (xhrobj.status == 201){
                     let obj = JSON.parse(xhrobj.response);
                     localStorage.setItem("usuario", obj.id);
+                    localStorage.setItem("nombreusuario", obj.usuario);
                     history.pushState(null, null, "#principal");
                     cambiarPagina();
                 } else if (xhrobj.status == 403) alert("Credenciales incorrectas");
@@ -333,6 +456,7 @@ document.addEventListener("DOMContentLoaded", _ => {
                 if (xhrobj.status == 200){
                     vaciarTarjeta();
                     localStorage.removeItem("usuario");
+                    localStorage.removeItem("nombreusuario");
                     location.href = "#sesion";
                 } else alert("Error al cerrar sesión");
             }
@@ -435,4 +559,8 @@ document.addEventListener("DOMContentLoaded", _ => {
     document.getElementById("editgenerootro").addEventListener("change", (e) => { window.generootroCamb = true; });
     document.getElementById("editbio").addEventListener("change", (e) => { window.bioCamb = true; });
     document.getElementById("editestado").addEventListener("change", (e) => { window.estadoCamb = true; });
+
+    for (let i of document.getElementById("emoji-lista").children){
+        i.addEventListener("click", reaccionar);
+    }
 });

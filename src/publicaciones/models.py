@@ -36,3 +36,7 @@ class Reaccion(models.Model):
     usuario = models.ForeignKey(Perfil, on_delete=models.CASCADE)
     publicacion = models.ForeignKey(Publicacion, on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['usuario', 'publicacion'], name='reaccion_usuario')
+        ]

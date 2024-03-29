@@ -188,14 +188,14 @@ def comentario_borrar(request, **kwargs):
 def reaccion_listar(request, **kwargs):
     obj = []
     try:
-        reacciones = Reacciones.objects.filter(publicacion_id=kwargs['int'])
+        reacciones = Reaccion.objects.filter(publicacion_id=kwargs['int'])
     except:
         return HttpResponse(status=400)
     for r in reacciones:
         obj.append({
             'id': r.pk,
             'tipo': r.tipo,
-            'usuario': r.usuario.username,
+            'usuario': r.usuario.usuario.username,
         })
     return JsonResponse(obj, status=200, safe=False)
 
@@ -205,17 +205,20 @@ def reaccion_crear(request, **kwargs):
     try:
         nuevo = Reaccion()
         nuevo.tipo = request.POST['tipo']
-        nuevo.usuario = request.user
+        nuevo.usuario = request.user.perfil
         nuevo.publicacion_id = kwargs['int']
         nuevo.full_clean()
         nuevo.save()
         return HttpResponse(status=201)
-    except:
+    except Exception as e:
+        raise e
         return HttpResponse(status=400)
 
 def reaccion_borrar(request, **kwargs):
+    if not request.user:
+        return HttpResponse(status=401)
     try:
-        reaccion = Reaccion.objects.get(pk=kwargs['int'])
+        reaccion = Reaccion.objects.get(publicacion_id=kwargs['int'], usuario=request.user.perfil)
     except:
         return HttpResponse(status=400)
     try:
