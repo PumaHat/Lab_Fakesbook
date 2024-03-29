@@ -447,7 +447,7 @@ document.addEventListener("DOMContentLoaded", _ => {
         xhrobj.send();
     });
 
-    document.getElementById("cerrar-sesion").addEventListener("click", (e) => {
+    document.getElementById("cerrar-sesion").addEventListener("click", _ => {
         let xhrobj = new XMLHttpRequest();
         xhrobj.open("POST", window.dominio+"/sesion_cerrar");
         xhrobj.withCredentials = true;
@@ -462,6 +462,10 @@ document.addEventListener("DOMContentLoaded", _ => {
             }
         });
         xhrobj.send();
+    });
+
+    document.getElementById("informacion").addEventListener("click", _ => {
+        location.href = "https://github.com/PumaHat/Lab_Fakesbook";
     });
 
     document.getElementById("publicar").addEventListener("click", (e) => {
