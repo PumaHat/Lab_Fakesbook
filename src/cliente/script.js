@@ -4,20 +4,46 @@ let urldom = new URL(document.location);
 urldom.port = "8001";
 window.dominio = urldom.origin;
 
-function reaccionar(event){}
+function reaccionar(e){}
 
-function crearComentario(event){}
+function borrarComentario(e){}
+
+function editarComentario(e){}
+
+function crearComentario(e){
+    let pid = e.target.parentNode.parentNode.parentNode.dataset.id;
+    let xhrobj = new XMLHttpRequest();
+    xhrobj.open("POST", window.dominio+"/comentario_crear/"+pid);
+    xhrobj.withCredentials = true;
+    xhrobj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhrobj.addEventListener("readystatechange", () => {
+        if (xhrobj.readyState == 4){
+            if (xhrobj.status == 201){
+                e.target.parentNode.parentNode.appendChild(dibujarComentario(JSON.parse(xhrobj.response)));
+                e.target.previousElementSibling.value = null;
+            } else alert("Error al crear un comentario");
+        }
+    });
+    xhrobj.send("texto="+encodeURIComponent(e.target.previousElementSibling.value));
+}
 
 function dibujarComentario(obj){
     let com = document.createElement("article");
     com.className = "comentario";
+    com.dataset.id = obj.id;
     let img = document.createElement("img");
-    img.src = "#";
-    let p = document.createElement("p");
-    p.textContent = "#";
-    let reacc = document.createElement("button");
-    reacc.textContent = "";
-    com.append(img, p, reacc);
+    img.src = window.dominio + "/usuario_descargar/" + obj.usuario_id;
+    let nom = document.createElement("span");
+    nom.textContent = obj.usuario;
+    let p = document.createElement("span");
+    p.textContent = obj.texto;
+    let edit = document.createElement("span");
+    edit.className = "material-symbols-outlined";
+    edit.textContent = "edit";
+    let borr = document.createElement("span");
+    borr.className = "material-symbols-outlined";
+    borr.textContent = "delete";
+    com.append(img, nom, p, edit, borr);
     return com;
 }
 
@@ -34,7 +60,8 @@ function dibujarPublicacion(obj){
     input.hidden = true;
     let h4 = document.createElement("h4");
     h4.textContent = obj.usuario;
-    let time = (new Date(obj.fecha)).toLocaleString();
+    let time = document.createElement("time");
+    time.textContent = (new Date(obj.fecha)).toLocaleString();
     header.append(img, input, h4, time);
     let contenido = document.createElement("div");
     contenido.className = "pub_contenido";
@@ -58,8 +85,18 @@ function dibujarPublicacion(obj){
     btnComentar.addEventListener("click", crearComentario);
     comentarios_crear.append(textArea, btnComentar);
     comentarios.append(comentarios_crear);
-    //for (let i = 0; )
-    // comentarios.append(...comentariosElems);
+    let xhrobj = new XMLHttpRequest();
+    xhrobj.open("GET", window.dominio+"/comentario_listar/"+obj.id);
+    xhrobj.addEventListener("readystatechange", () => {
+        if (xhrobj.readyState == 4){
+            if (xhrobj.status == 200){
+                for (let u of JSON.parse(xhrobj.response)){
+                    comentarios.appendChild(dibujarComentario(u));
+                }
+            } else alert("Error al obtener el listado de comentarios");
+        }
+    });
+    xhrobj.send();
     publi.append(header, contenido, comentarios);
     return publi;
 }
@@ -254,10 +291,10 @@ document.addEventListener("DOMContentLoaded", _ => {
             if (xhrobj.readyState == 4){
                 if (xhrobj.status == 201){
                     let obj = JSON.parse(xhrobj.response);
-                    let archivos = document.getElementById("nueva_archivo").files;
-                    if (archivos.length){
+                    let archivos = document.getElementById("nueva_archivo");
+                    if (archivos.files.length){
                         const formData = new FormData();
-                        formData.append("archivo", archivos[0]);
+                        formData.append("archivo", archivos.files[0]);
                         let xhrobj2 = new XMLHttpRequest();
                         xhrobj2.open("POST", window.dominio+"/publicacion_subir/"+obj.id);
                         xhrobj2.withCredentials = true;
@@ -268,7 +305,9 @@ document.addEventListener("DOMContentLoaded", _ => {
                             }
                         });
                         xhrobj2.send(formData);
+                        archivos.value = null;
                     } else location.reload();
+                    document.getElementById("nueva").value = null;
                 } else alert("Error al crear una publicación");
             }
         });

@@ -82,8 +82,7 @@ def publicacion_subir(request, **kwargs):
             for chunk in data.chunks():
                 f.write(chunk)
         return HttpResponse(status=200)
-    except Exception as e:
-        raise e
+    except:
         return HttpResponse(status=500)
 
 def publicacion_editar(request, **kwargs):
@@ -119,14 +118,16 @@ def publicacion_borrar(request, **kwargs):
 def comentario_listar(request, **kwargs):
     obj = []
     try:
-        comentarios = Comentario.objects.filter(publicacion_id=kwargs['int']).order_by('~fecha')
-    except:
+        comentarios = Comentario.objects.filter(publicacion_id=kwargs['int']).order_by('-fecha')
+    except Exception as e:
+        raise e
         return HttpResponse(status=400)
     for c in comentarios:
         obj.append({
             'id': c.pk,
             'texto': c.texto,
-            'usuario': c.usuario.username,
+            'usuario_id': c.usuario.pk,
+            'usuario': c.usuario.usuario.username,
             'fecha': c.fecha,
         })
     return JsonResponse(obj, status=200, safe=False)
@@ -137,11 +138,17 @@ def comentario_crear(request, **kwargs):
     try:
         nuevo = Comentario()
         nuevo.texto = request.POST['texto']
-        nuevo.usuario = request.user
+        nuevo.usuario = request.user.perfil
         nuevo.publicacion_id = kwargs['int']
         nuevo.full_clean()
         nuevo.save()
-        return HttpResponse(status=201)
+        return JsonResponse({
+            'id': nuevo.pk,
+            'texto': nuevo.texto,
+            'usuario_id': nuevo.usuario.pk,
+            'usuario': nuevo.usuario.usuario.username,
+            'fecha': nuevo.fecha,
+        }, status=201)
     except:
         return HttpResponse(status=400)
 
